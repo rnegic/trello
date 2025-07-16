@@ -30,9 +30,12 @@ interface EditTaskFormProps {
 }
 
 export function EditTaskForm({ taskId }: EditTaskFormProps) {
-  const { data: tasks = [] } = useGetTasksQuery();
+  const { data: tasksData = [], isLoading: isLoadingTasks } = useGetTasksQuery();
   const [updateTask, { isLoading }] = useUpdateTaskMutation();
   const navigate = useNavigate();
+  
+  // Убеждаемся, что tasks - это массив
+  const tasks = Array.isArray(tasksData) ? tasksData : [];
   const task = tasks.find((t) => t.id === taskId);
 
   const [title, setTitle] = useState(task?.title || '');
@@ -41,6 +44,7 @@ export function EditTaskForm({ taskId }: EditTaskFormProps) {
   const [status, setStatus] = useState(task?.status || 'To Do');
   const [priority, setPriority] = useState(task?.priority || 'Low');
 
+  if (isLoadingTasks) return <Container>Загрузка...</Container>;
   if (!task) return <Container>Задача не найдена</Container>;
 
   const handleSave = async () => {

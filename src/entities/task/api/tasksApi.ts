@@ -11,6 +11,19 @@ export const tasksApi = createApi({
         getTasks: builder.query<Task[], void>({
             query: () => '/tasks',
             providesTags: ['Task'],
+            transformResponse: (response: any): Task[] => {
+                // Убеждаемся, что ответ является массивом
+                if (Array.isArray(response)) {
+                    return response;
+                }
+                // Если ответ содержит данные в поле (например, { data: [...] })
+                if (response && Array.isArray(response.data)) {
+                    return response.data;
+                }
+                // В случае неожиданного формата возвращаем пустой массив
+                console.warn('Unexpected response format:', response);
+                return [];
+            },
         }),
         createTask: builder.mutation<Task, Omit<Task, 'id'>>({
             query: (task) => ({
