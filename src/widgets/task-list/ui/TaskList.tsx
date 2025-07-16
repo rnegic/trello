@@ -1,10 +1,10 @@
 import { Container, Grid, Title, Paper, rem, Group, Button } from '@mantine/core';
-import TaskItem from '@/components/TaskItem/TaskItem';
-import { useGetTasksQuery } from '@/store/api/tasksApi';
+import { TaskCard } from '@/entities/task';
+import { useGetTasksQuery } from '@/entities/task';
 import { IconPlus } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
 
-export default function TaskList() {
+export function TaskList() {
   const { data: tasks = [], isLoading, error } = useGetTasksQuery();
   const navigate = useNavigate();
 
@@ -41,7 +41,7 @@ export default function TaskList() {
                 border: '1.5px solid #ececec' 
               }}
             >
-              <TaskItem task={task} />
+              <TaskCard task={task} />
             </Paper>
           </Grid.Col>
         ))}

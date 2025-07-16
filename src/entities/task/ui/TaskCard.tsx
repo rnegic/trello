@@ -1,14 +1,14 @@
 import { Text, Group, Badge, Button, Stack, ActionIcon } from '@mantine/core';
-import { Task } from '@/types';
+import { Task } from '@/shared/types';
 import { useNavigate } from 'react-router-dom';
-import { useDeleteTaskMutation } from '@/store/api/tasksApi';
+import { useDeleteTaskMutation } from '@/entities/task';
 import { IconTrash } from '@tabler/icons-react';
 
-interface TaskItemProps {
+interface TaskCardProps {
   task: Task;
 }
 
-export default function TaskItem({ task }: TaskItemProps) {
+export function TaskCard({ task }: TaskCardProps) {
   const navigate = useNavigate();
   const [deleteTask, { isLoading }] = useDeleteTaskMutation();
 
