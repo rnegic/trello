@@ -1,8 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Title, Button, TextInput, Textarea, Select, Group } from '@mantine/core';
 import { useState } from 'react';
-import { useAppSelector, useAppDispatch } from '@/hooks/redux';
-import { updateTask } from '@/store/slices/tasksSlice';
+import { useGetTasksQuery, useUpdateTaskMutation } from '@/store/api/tasksApi';
 
 const categories = [
   { value: 'Bug', label: 'Bug' },
@@ -24,8 +23,8 @@ const priorities = [
 
 export default function TaskDetails() {
   const { id } = useParams();
-  const tasks = useAppSelector(state => state.tasks.tasks);
-  const dispatch = useAppDispatch();
+  const { data: tasks = [] } = useGetTasksQuery();
+  const [updateTask, { isLoading }] = useUpdateTaskMutation();
   const navigate = useNavigate();
   const task = tasks.find((t) => t.id === id);
 
@@ -37,16 +36,22 @@ export default function TaskDetails() {
 
   if (!task) return <Container>Задача не найдена</Container>;
 
-  const handleSave = () => {
-    dispatch(updateTask({
-      ...task,
-      title,
-      description,
-      category,
-      status,
-      priority,
-    }));
-    navigate('/');
+  const handleSave = async () => {
+    if (!task) return;
+    
+    try {
+      await updateTask({
+        ...task,
+        title,
+        description,
+        category,
+        status,
+        priority,
+      }).unwrap();
+      navigate('/');
+    } catch (error) {
+      console.error('Ошибка при обновлении задачи:', error);
+    }
   };
 
   return (
@@ -58,7 +63,7 @@ export default function TaskDetails() {
       <Select label="Статус" data={statuses} value={status} onChange={(v) => v && setStatus(v as typeof status)} required mb="md" />
       <Select label="Приоритет" data={priorities} value={priority} onChange={(v) => v && setPriority(v as typeof priority)} required mb="md" />
       <Group mt="lg">
-        <Button onClick={handleSave}>Сохранить</Button>
+        <Button onClick={handleSave} loading={isLoading}>Сохранить</Button>
         <Button variant="outline" color="gray" onClick={() => navigate('/')}>Отмена</Button>
       </Group>
     </Container>

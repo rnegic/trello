@@ -1,9 +1,9 @@
-import { Button, Modal, TextInput, Textarea, Select, Group } from '@mantine/core';
+import { Container, Title, Button, TextInput, Textarea, Select, Group, Paper } from '@mantine/core';
 import { useState } from 'react';
-import { useAppDispatch } from '@/hooks/redux';
-import { createTask } from '@/store/slices/tasksSlice';
-import { Task, TaskCategory, TaskStatus, TaskPriority } from '@/types';
-import { IconPlus } from '@tabler/icons-react';
+import { useNavigate } from 'react-router-dom';
+import { useCreateTaskMutation } from '@/store/api/tasksApi';
+import { TaskCategory, TaskStatus, TaskPriority } from '@/types';
+import { IconArrowLeft } from '@tabler/icons-react';
 
 const categories = [
     { value: 'Bug', label: 'Bug' },
@@ -25,58 +25,66 @@ const priorities = [
     { value: 'High', label: 'High' },
 ];
 
-export default function CreateTaskModal() {
-    const [opened, setOpened] = useState(false);
+export default function CreateTaskPage() {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [category, setCategory] = useState<TaskCategory>('Bug');
     const [status, setStatus] = useState<TaskStatus>('To Do');
     const [priority, setPriority] = useState<TaskPriority>('Medium');
 
-    const dispatch = useAppDispatch();
+    const navigate = useNavigate();
+    const [createTask, { isLoading }] = useCreateTaskMutation();
 
-    const handleCreate = () => {
+    const handleCreate = async () => {
         if (!title.trim()) return;
 
-        const newTask: Task = {
-            id: Date.now().toString(),
-            title: title.trim(),
-            description: description.trim() || undefined,
-            category,
-            status,
-            priority,
-        };
+        try {
+            await createTask({
+                title: title.trim(),
+                description: description.trim() || undefined,
+                category,
+                status,
+                priority,
+            }).unwrap();
 
-        dispatch(createTask(newTask));
-
-        setTitle('');
-        setDescription('');
-        setCategory('Bug');
-        setStatus('To Do');
-        setPriority('Medium');
-        setOpened(false);
+            navigate('/');
+        } catch (error) {
+            console.error('Ошибка при создании задачи:', error);
+        }
     };
 
     return (
-        <>
-            <Button leftSection={<IconPlus size={16} />} onClick={() => setOpened(true)}>
-                Создать задачу
-            </Button>
+        <Container size="sm" py="xl">
+            <Group mb="lg">
+                <Button
+                    variant="subtle"
+                    leftSection={<IconArrowLeft size={16} />}
+                    onClick={() => navigate('/')}
+                >
+                    Назад к списку
+                </Button>
+            </Group>
 
-            <Modal opened={opened} onClose={() => setOpened(false)} title="Создать новую задачу">
+            <Paper shadow="sm" radius="md" p="xl" withBorder>
+                <Title order={2} mb="lg">Создать новую задачу</Title>
+
                 <TextInput
                     label="Заголовок"
                     value={title}
                     onChange={(e) => setTitle(e.currentTarget.value)}
                     required
                     mb="md"
+                    error={!title.trim() && title.length > 0 ? 'Заголовок обязателен' : null}
                 />
+
                 <Textarea
                     label="Описание"
                     value={description}
                     onChange={(e) => setDescription(e.currentTarget.value)}
                     mb="md"
+                    minRows={3}
                 />
+
                 <Select
                     label="Категория"
                     data={categories}
@@ -85,6 +93,7 @@ export default function CreateTaskModal() {
                     required
                     mb="md"
                 />
+
                 <Select
                     label="Статус"
                     data={statuses}
@@ -93,6 +102,7 @@ export default function CreateTaskModal() {
                     required
                     mb="md"
                 />
+
                 <Select
                     label="Приоритет"
                     data={priorities}
@@ -101,11 +111,20 @@ export default function CreateTaskModal() {
                     required
                     mb="lg"
                 />
+
                 <Group justify="flex-end">
-                    <Button variant="outline" onClick={() => setOpened(false)}>Отмена</Button>
-                    <Button onClick={handleCreate} disabled={!title.trim()}>Создать</Button>
+                    <Button variant="outline" onClick={() => navigate('/')}>
+                        Отмена
+                    </Button>
+                    <Button
+                        onClick={handleCreate}
+                        disabled={!title.trim()}
+                        loading={isLoading}
+                    >
+                        Создать задачу
+                    </Button>
                 </Group>
-            </Modal>
-        </>
+            </Paper>
+        </Container>
     );
 }

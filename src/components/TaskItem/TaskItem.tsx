@@ -1,8 +1,7 @@
 import { Text, Group, Badge, Button, Stack, ActionIcon } from '@mantine/core';
 import { Task } from '@/types';
 import { useNavigate } from 'react-router-dom';
-import { useAppDispatch } from '@/hooks/redux';
-import { deleteTask } from '@/store/slices/tasksSlice';
+import { useDeleteTaskMutation } from '@/store/api/tasksApi';
 import { IconTrash } from '@tabler/icons-react';
 
 interface TaskItemProps {
@@ -11,10 +10,14 @@ interface TaskItemProps {
 
 export default function TaskItem({ task }: TaskItemProps) {
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
+  const [deleteTask, { isLoading }] = useDeleteTaskMutation();
 
-  const handleDelete = () => {
-    dispatch(deleteTask(task.id));
+  const handleDelete = async () => {
+    try {
+      await deleteTask(task.id).unwrap();
+    } catch (error) {
+      console.error('Ошибка при удалении задачи:', error);
+    }
   };
 
   return (
@@ -25,7 +28,13 @@ export default function TaskItem({ task }: TaskItemProps) {
           <Button size="xs" variant="light" color="blue" onClick={() => navigate(`/task/${task.id}`)}>
             Редактировать
           </Button>
-          <ActionIcon size="sm" color="red" variant="light" onClick={handleDelete}>
+          <ActionIcon 
+            size="md" 
+            color="red" 
+            variant="light" 
+            onClick={handleDelete}
+            loading={isLoading}
+          >
             <IconTrash size={16} />
           </ActionIcon>
         </Group>
