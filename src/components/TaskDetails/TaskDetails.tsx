@@ -1,7 +1,8 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useTaskContext } from '@/context/TaskContext';
 import { Container, Title, Button, TextInput, Textarea, Select, Group } from '@mantine/core';
 import { useState } from 'react';
+import { useAppSelector, useAppDispatch } from '@/hooks/redux';
+import { updateTask } from '@/store/slices/tasksSlice';
 
 const categories = [
   { value: 'Bug', label: 'Bug' },
@@ -23,7 +24,8 @@ const priorities = [
 
 export default function TaskDetails() {
   const { id } = useParams();
-  const { tasks, updateTask } = useTaskContext();
+  const tasks = useAppSelector(state => state.tasks.tasks);
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const task = tasks.find((t) => t.id === id);
 
@@ -36,14 +38,14 @@ export default function TaskDetails() {
   if (!task) return <Container>Задача не найдена</Container>;
 
   const handleSave = () => {
-    updateTask({
+    dispatch(updateTask({
       ...task,
       title,
       description,
       category,
       status,
       priority,
-    });
+    }));
     navigate('/');
   };
 

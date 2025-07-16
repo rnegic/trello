@@ -1,13 +1,14 @@
-import { TaskProvider } from '@/context/TaskContext';
 import AppRouter from './AppRouter';
 import { MantineProvider } from '@mantine/core';
+import { Provider } from 'react-redux';
+import { store } from '@/store';
 
 function App() {
   return (
     <MantineProvider withCssVariables>
-      <TaskProvider>
+      <Provider store={store}>
         <AppRouter />
-      </TaskProvider>
+      </Provider>
     </MantineProvider>
   );
 }
