@@ -4,7 +4,11 @@ import { Task } from '@/shared/types';
 export const tasksApi = createApi({
     reducerPath: 'tasksApi',
     baseQuery: fetchBaseQuery({
-        baseUrl: 'http://localhost:3000/api',
+        baseUrl: 'https://trello-api-git-main-rnegs-projects.vercel.app/api',
+        prepareHeaders: (headers) => {
+            headers.set('Content-Type', 'application/json');
+            return headers;
+        },
     }),
     tagTypes: ['Task'],
     endpoints: (builder) => ({
@@ -12,6 +16,7 @@ export const tasksApi = createApi({
             query: () => '/tasks',
             providesTags: ['Task'],
             transformResponse: (response: any): Task[] => {
+                console.log('API Response:', response);
                 // Убеждаемся, что ответ является массивом
                 if (Array.isArray(response)) {
                     return response;
@@ -19,6 +24,10 @@ export const tasksApi = createApi({
                 // Если ответ содержит данные в поле (например, { data: [...] })
                 if (response && Array.isArray(response.data)) {
                     return response.data;
+                }
+                // Если ответ содержит tasks в поле (например, { tasks: [...] })
+                if (response && Array.isArray(response.tasks)) {
+                    return response.tasks;
                 }
                 // В случае неожиданного формата возвращаем пустой массив
                 console.warn('Unexpected response format:', response);
