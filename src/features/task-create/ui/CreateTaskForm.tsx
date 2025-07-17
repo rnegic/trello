@@ -1,7 +1,7 @@
 import { Button, Modal, TextInput, Textarea, Select, Group } from '@mantine/core';
 import { useState } from 'react';
 import { useCreateTaskMutation } from '@/entities/task';
-import { Task, TaskCategory, TaskStatus, TaskPriority } from '@/shared/types';
+import { TaskCategory, TaskStatus, TaskPriority } from '@/shared/types';
 import { IconPlus } from '@tabler/icons-react';
 
 const categories = [

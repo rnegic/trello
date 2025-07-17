@@ -2,7 +2,6 @@ import { Container, Title, Button, TextInput, Textarea, Select, Group, Paper } f
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGetTasksQuery, useUpdateTaskMutation } from '@/entities/task';
-import { TaskCategory, TaskStatus, TaskPriority } from '@/shared/types';
 import { IconArrowLeft } from '@tabler/icons-react';
 
 const categories = [
