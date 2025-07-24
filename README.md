@@ -39,5 +39,3 @@
 
 1.  `npm install`
 2.  `npm run dev` или `npm start`
-
-ДЕПЛОЙ НА gh pages: https://rnegic.github.io/trello/
